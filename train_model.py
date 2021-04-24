@@ -10,7 +10,7 @@ from nets import net_select
 import preprocessing_select
 
 
-batch_size = 12
+batch_size = 32
 train_image_size = 448
 num_clones = 1
 num_ps_tasks = 8
@@ -130,7 +130,7 @@ def get_variables_to_train(trainable_scopes):
         variables_to_train.extend(variables)
     return variables_to_train
 
-def main(model_root,datasets_dir):
+def main(model_root,datasets_dir,model_name ):
     # tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
     # 训练相关参数设置
     with tf.Graph().as_default():
@@ -143,7 +143,6 @@ def main(model_root,datasets_dir):
 
         global_step = slim.create_global_step()
 
-        model_name = 'vgg_16'
         train_dir =os.path.join(model_root, model_name)
         dataset = convert_data.get_datasets('train',dataset_dir=datasets_dir)
 
@@ -401,6 +400,7 @@ def main(model_root,datasets_dir):
 if __name__ == '__main__':
     model_root = "D:/Programming/WS_DAN/models"
     datasets_dir = "D:/Programming/WS_DAN/datasets"
+    model_name = 'vgg_16'
     # os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
-    main(model_root= model_root,datasets_dir= datasets_dir)
+    main(model_root= model_root,datasets_dir= datasets_dir,model_name = 'vgg_16')

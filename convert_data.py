@@ -14,11 +14,11 @@ _NUM_SHARDS = 5
 
 LABELS_FILENAME = 'labels.txt'
 
-_FILE_PATTERN = 'Car_%s_*.tfrecord'
+_FILE_PATTERN = 'food_%s_*.tfrecord'
 
-SPLITS_TO_SIZES = {'train': 8144, 'test': 8041}
+SPLITS_TO_SIZES = {'train': 145069, 'test': 20253}
 
-_NUM_CLASSES = 196
+_NUM_CLASSES = 208
 
 _ITEMS_TO_DESCRIPTIONS = {
     'image': 'A color image of varying size.',
@@ -126,7 +126,7 @@ def get_filenames_and_classes(dataset_dir):
 
 
 def get_dataset_filename(dataset_dir, split_name, shard_id):
-    output_filename = 'Car_%s_%05d-of-%05d.tfrecord' % (
+    output_filename = 'Food_%s_%05d-of-%05d.tfrecord' % (
         split_name, shard_id, _NUM_SHARDS)
     if not os.path.exists(os.path.join(dataset_dir, 'tfrecords')):
         os.makedirs(os.path.join(dataset_dir, 'tfrecords'))
@@ -246,7 +246,37 @@ def convert_dataset(split_name, dataset, dataset_dir):
 #
 #     return train_dataset, test_dataset
 
-def generate_datasets(data_root):
+def generate_food_datasets(data_root):
+    train_dataset = []
+    val_dataset = []
+
+    train_path = os.path.join(data_root,'train')
+    val_path = os.path.join(data_root,'val')
+
+    lables = os.listdir(train_path)
+    print(lables)
+
+    for label in lables:
+        image = os.listdir(train_path + label)
+        for i in range(len(image)):
+            example = {}
+            image[i] = label + "/" + image[i]
+            example['filename'] = os.path.join(train_path,image)
+            example['label'] = int(label)
+            train_dataset.append(example)
+
+    for label in lables:
+        image = os.listdir(val_path + label)
+        for i in range(len(image)):
+            example = {}
+            image[i] = label + "/" + image[i]
+            example['filename'] = os.path.join(val_path, image)
+            example['label'] = int(label)
+            val_dataset.append(example)
+
+    return train_dataset,val_dataset
+
+def generate_car_datasets(data_root):
     train_info = sio.loadmat(os.path.join(data_root, 'devkit', 'cars_train_annos.mat'))['annotations'][0]
     test_info = sio.loadmat(os.path.join(data_root, 'devkit', 'cars_test_annos.mat'))['annotations'][0]
 
@@ -297,7 +327,8 @@ def run(dataset_dir):
     # Divide into train and test:
     random.seed(_RANDOM_SEED)
 
-    train_dataset, test_dataset = generate_datasets(dataset_dir)
+    # train_dataset, test_dataset = generate_car_datasets(dataset_dir)
+    train_dataset, test_dataset = generate_food_datasets(dataset_dir)
 
     random.shuffle(train_dataset)
     random.shuffle(test_dataset)
